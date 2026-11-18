@@ -1,0 +1,6 @@
+cluster,segment,clients,avg_age,avg_satisfaction,avg_units,avg_unit_price,avg_total_spend,office_share,loan_rate,investment_rate,company_rate,usa_rate,share_pct
+0,Office-Focused & Older Buyers,442,61.0,2.97,3.37,367122.2,1232222.87,0.4,0.34,0.33,0.03,0.76,22.1
+1,Dissatisfied & Younger Buyers,467,43.95,1.52,3.6,330261.16,1187271.8,0.1,0.37,0.33,0.08,0.76,23.4
+2,Older & Apartment-Focused Buyers,532,72.35,3.16,3.64,339235.58,1229270.57,0.04,0.36,0.27,0.02,0.8,26.6
+3,Satisfied & Younger Buyers,509,41.26,4.28,3.6,355135.53,1273121.53,0.09,0.4,0.31,0.07,0.74,25.4
+4,Bulk & Older Buyers,50,64.44,3.54,7.32,328852.52,2393234.48,0.14,0.32,0.36,0.04,0.86,2.5
