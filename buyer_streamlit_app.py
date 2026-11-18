@@ -21,6 +21,8 @@ segments = list(df.sort_values("cluster")["segment"].unique())   # fixed order f
 
 st.title("Buyer Segmentation & Investment Profiling Dashboard")
 st.caption("Parcl Co. Limited - Real Estate Market Intelligence")
+st.caption("The 5 segments were created once on all 2,000 clients. The filters only change which clients are shown, "
+           "they do not create the segments again.")
 
 # ---------------- sidebar filters ----------------
 st.sidebar.header("Filters")
@@ -37,7 +39,7 @@ if country_pick:
 if region_pick:
     data = data[data["region"].isin(region_pick)]
 
-st.sidebar.write(f"**{len(data)}** clients match the filters")
+st.sidebar.write(f"**{len(data)}** of {len(df)} clients match the filters")
 if data.empty:
     st.warning("No clients match these filters. Please change the filters.")
     st.stop()
@@ -48,10 +50,10 @@ tab1, tab2, tab3, tab4 = st.tabs(["Segmentation Overview", "Investor Behavior",
 # ---------------- tab 1: overview ----------------
 with tab1:
     a, b, c, d = st.columns(4)
-    a.metric("Clients", len(data))
-    b.metric("Segments", data["segment"].nunique())
-    c.metric("Avg satisfaction", round(data["satisfaction_score"].mean(), 2))
-    d.metric("Avg units bought", round(data["units_bought"].mean(), 2))
+    a.metric("Clients (current filters)", len(data))
+    b.metric("Segments in view", data["segment"].nunique())
+    c.metric("Avg satisfaction (filtered)", round(data["satisfaction_score"].mean(), 2))
+    d.metric("Avg units bought (filtered)", round(data["units_bought"].mean(), 2))
 
     left, right = st.columns(2)
     with left:
@@ -166,5 +168,11 @@ with tab4:
     for col in ["client_type", "acquisition_purpose", "country", "referral_channel"]:
         st.write(f"**{col.replace('_', ' ').title()}**")
         st.dataframe(one[col].value_counts(normalize=True).mul(100).round(1).rename("Share (%)").head(6).to_frame())
+
+    st.subheader("Client list of this segment (for follow-up)")
+    st.caption("Sorted by total spend. Client IDs let the team find the client in the CRM.")
+    st.dataframe(one[["client_id", "country", "region", "client_type", "acquisition_purpose", "satisfaction_score",
+                      "loan_applied", "age", "units_bought", "total_spend"]]
+                 .sort_values("total_spend", ascending=False), hide_index=True)
 
     st.download_button("Download segmented clients (CSV)", data.to_csv(index=False), "segmented_clients.csv")

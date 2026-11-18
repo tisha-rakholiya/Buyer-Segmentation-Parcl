@@ -18,6 +18,7 @@ from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.metrics import silhouette_score, adjusted_rand_score
 from sklearn.decomposition import PCA
 from scipy.cluster.hierarchy import linkage, dendrogram
+from scipy.stats import mannwhitneyu, chi2_contingency
 
 warnings.filterwarnings("ignore")
 sns.set_style("whitegrid")
@@ -314,6 +315,39 @@ plt.figure(figsize=(7, 5))
 sns.scatterplot(x=points[:, 0], y=points[:, 1], hue=df["segment"], s=15)
 plt.title("Clients in 2D (PCA)")
 save("clusters_pca.png")
+
+
+# =====================================================
+# STEP 7: CHECKS (statistical tests and stability)
+# =====================================================
+print("\nSTEP 7: Statistical checks")
+
+# (a) Do the stated groups really behave differently? (Mann-Whitney U test, p < 0.05 means a real difference)
+rows = []
+for col, a, b in [("acquisition_purpose", "Home", "Investment"), ("client_type", "Individual", "Company"), ("loan_applied", "Yes", "No")]:
+    for target in ["units_bought", "total_spend", "satisfaction_score"]:
+        x = df[df[col] == a][target]
+        y = df[df[col] == b][target]
+        rows.append({"test": f"{a} vs {b}", "variable": target, "mean_first": round(x.mean(), 2),
+                     "mean_second": round(y.mean(), 2), "p_value": round(mannwhitneyu(x, y).pvalue, 4)})
+tests = pd.DataFrame(rows)
+print(tests.to_string(index=False))
+
+# (b) Are the segments linked to purpose / client type? (chi-square test)
+for col in ["acquisition_purpose", "client_type"]:
+    chi_p = chi2_contingency(pd.crosstab(df["segment"], df[col]))[1]
+    print(f"Chi-square, segment vs {col}: p = {chi_p:.4f}")
+    tests.loc[len(tests)] = {"test": f"segment vs {col}", "variable": "chi-square", "p_value": round(chi_p, 4)}
+
+# (c) Are the clusters stable? Run K-Means with 10 different random seeds and compare with our result
+aris = []
+for seed in range(10):
+    other = KMeans(n_clusters=best_k, n_init=10, random_state=seed).fit(X).labels_
+    aris.append(adjusted_rand_score(df["cluster"], other))
+print(f"Stability: average agreement with other random seeds (ARI) = {np.mean(aris):.3f} (min {np.min(aris):.3f})")
+tests.loc[len(tests)] = {"test": "stability over 10 seeds", "variable": "ARI mean", "p_value": round(float(np.mean(aris)), 3)}
+
+tests.to_csv(os.path.join(OUT, "statistical_tests.csv"), index=False)
 
 print("\nDONE. Check the 'outputs' folder.")
 print("Clients:", len(df), "| K:", best_k, "| segments:", list(names.values()))
