@@ -2,7 +2,7 @@
 
 Machine learning project built for **Parcl Co. Limited** as part of the Unified Mentor Machine Learning Fellowship. It uses **K-Means and hierarchical clustering** to group 2,000 real estate clients into buyer segments, and delivers the results in an interactive **Streamlit dashboard**.
 
-🔗 **Live Dashboard:** [https://YOUR-APP-NAME.streamlit.app](https://YOUR-APP-NAME.streamlit.app)
+🔗 **Live Dashboard:** https://buyer-segmentation-parcl-etzi3fe8htvwfqderwushm.streamlit.app/
 
 ---
 
